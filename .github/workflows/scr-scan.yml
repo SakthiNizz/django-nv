@@ -81,24 +81,13 @@ jobs:
   
       - name: Install Syft
         run: |
-          # Download the Syft binary
-          curl -sSL https://github.com/anchore/syft/releases/download/v0.50.0/syft-linux-amd64 -o syft
-          # Verify the download and check that the file is not empty
-          ls -l syft
-          file syft
-          # Make the binary executable
+          curl -sSLo syft.tar.gz https://github.com/anchore/syft/releases/download/v0.104.0/syft_0.104.0_linux_amd64.tar.gz
+          tar -xzf syft.tar.gz syft
           chmod +x syft
-          # Move it to the correct location
           sudo mv syft /usr/local/bin/syft
   
-      - name: Verify Syft Installation
-        run: |
-          syft --version
-  
-      - name: Run Syft Scan
-        run: syft . -o json
-
-
+      - name: Run SBOM Scan
+        run: syft . -o table
 
   # # Infrastructure as Code - Trivy
   # iac_trivy:
