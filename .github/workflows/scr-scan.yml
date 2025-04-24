@@ -39,15 +39,18 @@ jobs:
   #         format: 'HTML'
 
   # # Secrets Scan - Gitleaks
-  secrets_gitleaks:
-    name: Secret_Scan-Gitleaks
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+ secrets_gitleaks:
+  name: Secret Scan - Gitleaks
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
 
-      - name: Run Gitleaks
-        uses: zricethezav/gitleaks-action@v2.3.4
+    - name: Run Gitleaks
+      uses: gitleaks/gitleaks-action@v2.2.0
+      with:
+        scan-dir: "."
+
 
   # # Container Security - Trivy
   # container_trivy:
