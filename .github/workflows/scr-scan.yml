@@ -52,13 +52,7 @@ jobs:
         chmod +x gitleaks
 
     - name: Run Gitleaks Scan
-      run: ./gitleaks detect --source . --report-format json --report-path gitleaks-report.json
-
-    - name: Upload Gitleaks Report
-      uses: actions/upload-artifact@v2
-      with:
-        name: gitleaks-report
-        path: gitleaks-report.json
+      run: ./gitleaks detect --source . --report-format stdout  # Output to the console
 
   # # Container Security - Trivy
   # container_trivy:
