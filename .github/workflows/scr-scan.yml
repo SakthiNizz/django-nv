@@ -1,4 +1,4 @@
-name: 🛡️ SCR Security Scans
+name: SCR Security Scans
 
 on:
   push:
@@ -12,7 +12,7 @@ on:
 jobs:
   # SAST - Bandit
   sast_bandit:
-    name: 🧠 SAST - Bandit
+    name: SAST-Bandit
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -25,7 +25,7 @@ jobs:
 
   # SCA - Dependency Check
   sca_dependency_check:
-    name: 📦 SCA - Dependency Check
+    name: SCA-Dependency Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -40,7 +40,7 @@ jobs:
 
   # Secrets Scan - Gitleaks
   secrets_gitleaks:
-    name: 🔐 Secret Scan - Gitleaks
+    name: Secret_Scan-Gitleaks
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -51,7 +51,7 @@ jobs:
 
   # Container Security - Trivy
   container_trivy:
-    name: 🐳 Container Scan - Trivy
+    name: Container Scan-Trivy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -65,7 +65,7 @@ jobs:
 
   # SBOM Generation - Syft
   sbom_syft:
-    name: 📄 SBOM - Syft
+    name: SBOM-Syft
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -79,7 +79,7 @@ jobs:
 
   # Infrastructure as Code - Trivy
   iac_trivy:
-    name: 🌍 IaC Scan - Trivy
+    name: IaC Scan-Trivy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -93,7 +93,7 @@ jobs:
 
   # DAST - ZAP
   dast_zap:
-    name: 🌐 DAST - ZAP Full Scan
+    name: DAST-ZAP Full Scan
     runs-on: ubuntu-latest
     steps:
       - name: Run ZAP Full Scan
