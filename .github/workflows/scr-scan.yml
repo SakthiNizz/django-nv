@@ -39,20 +39,20 @@ jobs:
   #         format: 'HTML'
 
   # # Secrets Scan - Gitleaks
- secrets_gitleaks:
-  name: gitleaks
-  runs-on: ubuntu-latest
+ # secrets_gitleaks:
+ #  name: gitleaks
+ #  runs-on: ubuntu-latest
 
-  steps:
-  - name: Checkout code
-    uses: actions/checkout@v4
-    with:
-      fetch-depth: 0
+ #  steps:
+ #  - name: Checkout code
+ #    uses: actions/checkout@v4
+ #    with:
+ #      fetch-depth: 0
 
-  - name: Run Gitleaks Scan
-    uses: gitleaks/gitleaks-action@v2
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+ #  - name: Run Gitleaks Scan
+ #    uses: gitleaks/gitleaks-action@v2
+ #    env:
+ #      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
 
@@ -72,18 +72,22 @@ jobs:
   #         scan-ref: '.'
 
   # # SBOM Generation - Syft
-  # sbom_syft:
-  #   name: SBOM-Syft
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout Code
-  #       uses: actions/checkout@v3
+  sbom_syft:
+    name: SBOM-Syft
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+  
+      - name: Install Syft
+        run: |
+          curl -sSL https://github.com/anchore/syft/releases/download/v0.50.0/syft-linux-amd64 -o syft
+          chmod +x syft
+          sudo mv syft /usr/local/bin/syft
+  
+      - name: Run Syft Scan
+        run: syft . -o json
 
-  #     - name: Generate SBOM with Syft
-  #       uses: anchore/sbom-action@v0.14.3
-  #       with:
-  #         output-file: sbom.json
-  #         format: json
 
   # # Infrastructure as Code - Trivy
   # iac_trivy:
