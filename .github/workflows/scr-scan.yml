@@ -40,19 +40,15 @@ jobs:
 
   # # Secrets Scan - Gitleaks
  secrets_gitleaks:
-  name: Secret Scan - Gitleaks
-  runs-on: ubuntu-latest
-  steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
-
-    - name: Install Gitleaks
-      run: |
-        curl -sSL https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks-linux-amd64 -o gitleaks
-        chmod +x gitleaks
-
-    - name: Run Gitleaks Scan
-      run: ./gitleaks detect --source . --report-format stdout  # Output to the console
+  name: gitleaks
+	runs-on: ubuntu-latest
+	steps:
+	  - uses: actions/checkout@v4
+		with:
+		  fetch-depth: 0
+    - uses: gitleaks/gitleaks-action@v2
+		env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # # Container Security - Trivy
   # container_trivy:
