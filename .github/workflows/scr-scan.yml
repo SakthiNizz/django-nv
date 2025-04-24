@@ -55,11 +55,11 @@ jobs:
       run: ./gitleaks detect --source . --report-format json --report-path gitleaks-report.json
 
     - name: Upload Gitleaks Report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v2
       with:
         name: gitleaks-report
         path: gitleaks-report.json
-
+        token: ${{ secrets.GITHUB_TOKEN }}
 
   # # Container Security - Trivy
   # container_trivy:
