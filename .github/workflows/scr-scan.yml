@@ -1,0 +1,82 @@
+name: 🛡️ SCR Security Scans
+
+on:
+  push:
+    branches:
+      - staging
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  sast_bandit:
+    name: 🧠 SAST - Bandit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Bandit
+        run: |
+          pip install bandit
+          bandit -r . -ll
+
+  sca_dependency_check:
+    name: 📦 SCA - Dependency Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: django-nv
+          path: '.'
+          format: 'HTML'
+
+  secrets_gitleaks:
+    name: 🔐 Secret Scan - Gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Gitleaks
+        uses: zricethezav/gitleaks-action@v2.3.4
+
+  container_trivy:
+    name: 🐳 Container Scan - Trivy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Trivy FS Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+
+  sbom_syft:
+    name: 📄 SBOM - Syft
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Generate SBOM with Syft
+        uses: anchore/sbom-action@v0.14.3
+        with:
+          output-file: sbom.json
+          format: json
+
+  iac_trivy:
+    name: 🌍 IaC Scan - Trivy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Trivy IaC Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          scan-ref: '.'
+
+  dast_zap:
+    name: 🌐 DAST - ZAP Full Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run ZAP Full Scan
+        uses: zaproxy/action-full-scan@v0.7.0
+        with:
+          target: 'https://demo.testfire.net/login.jsp' 
