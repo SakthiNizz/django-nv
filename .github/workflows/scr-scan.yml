@@ -54,6 +54,13 @@ jobs:
     - name: Run Gitleaks Scan
       run: ./gitleaks detect --source . --report-format json --report-path gitleaks-report.json
 
+    - name: Upload Gitleaks Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: gitleaks-report
+        path: gitleaks-report.json
+
+
   # # Container Security - Trivy
   # container_trivy:
   #   name: Container Scan-Trivy
