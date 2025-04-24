@@ -11,17 +11,17 @@ on:
 
 jobs:
   # SAST - Bandit
-  sast_bandit:
-    name: SAST-Bandit
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+  # sast_bandit:
+  #   name: SAST-Bandit
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v3
 
-      - name: Install Bandit & Run Scan
-        run: |
-          pip install bandit
-          bandit -r . -ll || true
+  #     - name: Install Bandit & Run Scan
+  #       run: |
+  #         pip install bandit
+  #         bandit -r . -ll || true
 
   # # SCA - Dependency Check
   # sca_dependency_check:
@@ -39,15 +39,15 @@ jobs:
   #         format: 'HTML'
 
   # # Secrets Scan - Gitleaks
-  # secrets_gitleaks:
-  #   name: Secret_Scan-Gitleaks
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout Code
-  #       uses: actions/checkout@v3
+  secrets_gitleaks:
+    name: Secret_Scan-Gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-  #     - name: Run Gitleaks
-  #       uses: zricethezav/gitleaks-action@v2.3.4
+      - name: Run Gitleaks
+        uses: zricethezav/gitleaks-action@v2.3.4
 
   # # Container Security - Trivy
   # container_trivy:
