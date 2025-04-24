@@ -59,7 +59,6 @@ jobs:
       with:
         name: gitleaks-report
         path: gitleaks-report.json
-        token: ${{ secrets.GITHUB_TOKEN }}
 
   # # Container Security - Trivy
   # container_trivy:
