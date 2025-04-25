@@ -3,7 +3,7 @@ name: DAST-ZAP Full Scan
 permissions:
   issues: write
   contents: read
-  
+
 on:
   schedule:
     # Run at 00:00 UTC every 15th day of the month
@@ -20,3 +20,13 @@ jobs:
         uses: zaproxy/action-full-scan@v0.7.0
         with:
           target: 'https://demo.testfire.net/login.jsp'
+          # Ensure output format is JSON
+          reportType: 'json'
+          # Specify the location of the JSON report output
+          reportFile: '/zap/wrk/zap_scan_report.json'
+
+      - name: Save ZAP scan JSON report as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: zap_scan_report_json  # Artifact name for JSON output
+          path: /zap/wrk/zap_scan_report.json  # Path to the generated JSON report
