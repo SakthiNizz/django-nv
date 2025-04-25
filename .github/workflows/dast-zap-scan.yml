@@ -16,28 +16,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install ZAP and dependencies
+      - name: Install Java and Download ZAP
         run: |
           sudo apt-get update
           sudo apt-get install -y openjdk-11-jdk
-          # Install ZAP directly using apt (if available)
-          sudo apt-get install -y zaproxy
+          # Download the latest ZAP release
+          curl -sS https://github.com/zaproxy/zaproxy/releases/download/v2.11.1/ZAP_2.11.1_Unix.tar.gz -o zap.tar.gz
           
-          # If installation via apt is not successful, fall back to tar method
-          if ! command -v zap &> /dev/null
-          then
-            echo "ZAP not found, downloading from GitHub..."
-            curl -sS https://github.com/zaproxy/zaproxy/releases/download/v2.11.1/ZAP_2.11.1_Unix.tar.gz -o zap.tar.gz
-            # Check if the file was downloaded correctly
-            ls -lh zap.tar.gz
-            # Extract the archive
-            tar -xvf zap.tar.gz
-            # Check if the folder is extracted correctly
-            ls -lh
-            sudo mv zap-2.11.1 /opt/zap
-            sudo ln -s /opt/zap/zap.sh /usr/local/bin/zap
-          fi
+          # Check if the file was downloaded correctly
+          ls -lh zap.tar.gz
+
+          # Extract the archive and verify extraction
+          tar -xvf zap.tar.gz
+          ls -lh
+
+          # Move to appropriate directory
+          sudo mv zap-2.11.1 /opt/zap
+          sudo ln -s /opt/zap/zap.sh /usr/local/bin/zap
 
       - name: Run ZAP Full Scan and print result in console
         run: |
+          # Run ZAP scan
           zap -cmd -quickurl 'https://demo.testfire.net/login.jsp' -quickout /dev/stdout -json
