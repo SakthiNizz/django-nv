@@ -2,106 +2,130 @@ name: SCR Security Scans
 
 on:
   push:
-    branches:
-      - staging
+    branches: [staging]
   pull_request:
-    branches:
-      - master
+    branches: [master]
   workflow_dispatch:
 
 jobs:
+  # SAST - Bandit
   sast_bandit:
     name: SAST-Bandit
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
       - name: Install Bandit & Run Scan
         run: |
           pip install bandit
           bandit -r . -f json -o bandit-report.json || true
 
+      - name: Upload Bandit Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: bandit-report
+          path: bandit-report.json
+
+  # SCA - Dependency Check
   sca_dependency_check:
     name: SCA-Dependency Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
       - name: Run Dependency Check
         uses: dependency-check/Dependency-Check_Action@main
         with:
           project: django-nv
           path: '.'
           format: 'JSON'
-          outputDirectory: './sca-reports'
 
+      - name: Upload Dependency Check Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: dependency-check-report
+          path: dependency-check-report.json
+
+  # Secrets Scan - Gitleaks
   secrets_gitleaks:
     name: Secrets Scan - Gitleaks
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Run Gitleaks
         run: |
           curl -sSL https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks-linux-amd64 -o gitleaks
           chmod +x gitleaks
           ./gitleaks detect --source . --report-format json --report-path gitleaks-report.json || true
 
+      - name: Upload Gitleaks Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: gitleaks-report
+          path: gitleaks-report.json
+
+  # Container Scan - Trivy
   container_trivy:
     name: Container Scan - Trivy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-      - name: Install Trivy & Run Filesystem Scan
-        run: |
-          sudo apt-get install -y wget
-          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.49.1_Linux-64bit.deb
-          sudo dpkg -i trivy_0.49.1_Linux-64bit.deb
-          trivy fs . --format json --output trivy-container-report.json || true
 
-  iac_trivy:
-    name: IaC Scan - Trivy
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-      - name: Run Trivy IaC Scan
+      - name: Install Trivy & Run Scan
         run: |
-          trivy config . --format json --output trivy-iac-report.json || true
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+          trivy fs . --format json --output trivy-fs-report.json || true
 
+      - name: Upload Trivy Filesystem Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: trivy-fs-report
+          path: trivy-fs-report.json
+
+  # SBOM - Syft
   sbom_syft:
     name: SBOM - Syft
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-      - name: Install Syft
+
+      - name: Install Syft & Generate SBOM
         run: |
           curl -sSLo syft.tar.gz https://github.com/anchore/syft/releases/download/v0.104.0/syft_0.104.0_linux_amd64.tar.gz
           tar -xzf syft.tar.gz syft
           chmod +x syft
           sudo mv syft /usr/local/bin/syft
-      - name: Run SBOM Scan
-        run: syft . -o json > syft-sbom.json
+          syft . -o json > sbom-syft-report.json
 
-  upload_reports:
-    name: Upload JSON Reports
-    runs-on: ubuntu-latest
-    needs: [sast_bandit, sca_dependency_check, secrets_gitleaks, container_trivy, iac_trivy, sbom_syft]
-    steps:
-      - name: Download All Reports
-        uses: actions/checkout@v3
-      - name: Upload Reports as Artifact
+      - name: Upload SBOM Report
         uses: actions/upload-artifact@v3
         with:
-          name: security-scan-json-reports
-          path: |
-            bandit-report.json
-            gitleaks-report.json
-            trivy-container-report.json
-            trivy-iac-report.json
-            syft-sbom.json
-            ./sca-reports/dependency-check-report.json
+          name: sbom-syft-report
+          path: sbom-syft-report.json
+
+  # IaC Scan - Trivy
+  iac_trivy:
+    name: IaC Scan - Trivy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install Trivy & Run IaC Scan
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+          trivy config . --format json --output trivy-iac-report.json || true
+
+      - name: Upload Trivy IaC Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: trivy-iac-report
+          path: trivy-iac-report.json
