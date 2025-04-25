@@ -25,6 +25,15 @@ jobs:
           # Specify the location of the JSON report output
           reportFile: '/zap/wrk/zap_scan_report.json'
 
+      - name: Verify JSON file exists
+        run: |
+          if [ ! -f /zap/wrk/zap_scan_report.json ]; then
+            echo "ZAP scan report file not found!"
+            exit 1
+          else
+            echo "ZAP scan report found."
+          fi
+
       - name: Save ZAP scan JSON report as artifact
         uses: actions/upload-artifact@v2
         with:
