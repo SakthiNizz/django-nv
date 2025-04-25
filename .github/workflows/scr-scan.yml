@@ -5,16 +5,16 @@ on:
     branches: [staging]
   pull_request:
     branches: [master]
+  schedule:
+    - cron: '0 0 */15 * *'  # every 15 days at midnight UTC
   workflow_dispatch:
 
 jobs:
   # SAST - Bandit
   sast_bandit:
-    name: SAST-Bandit
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Install Bandit & Run Scan
         run: |
@@ -22,18 +22,16 @@ jobs:
           bandit -r . -f json -o bandit-report.json || true
 
       - name: Upload Bandit Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: bandit-report
           path: bandit-report.json
 
   # SCA - Dependency Check
   sca_dependency_check:
-    name: SCA-Dependency Check
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Run Dependency Check
         uses: dependency-check/Dependency-Check_Action@main
@@ -43,18 +41,16 @@ jobs:
           format: 'JSON'
 
       - name: Upload Dependency Check Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: dependency-check-report
           path: dependency-check-report.json
 
-  # Secrets Scan - Gitleaks
+  # Secrets - Gitleaks
   secrets_gitleaks:
-    name: Secrets Scan - Gitleaks
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -65,37 +61,33 @@ jobs:
           ./gitleaks detect --source . --report-format json --report-path gitleaks-report.json || true
 
       - name: Upload Gitleaks Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: gitleaks-report
           path: gitleaks-report.json
 
-  # Container Scan - Trivy
+  # Container - Trivy Filesystem
   container_trivy:
-    name: Container Scan - Trivy
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Install Trivy & Run Scan
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
           trivy fs . --format json --output trivy-fs-report.json || true
 
-      - name: Upload Trivy Filesystem Report
-        uses: actions/upload-artifact@v3
+      - name: Upload Trivy FS Report
+        uses: actions/upload-artifact@v2
         with:
           name: trivy-fs-report
           path: trivy-fs-report.json
 
   # SBOM - Syft
   sbom_syft:
-    name: SBOM - Syft
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Install Syft & Generate SBOM
         run: |
@@ -105,19 +97,17 @@ jobs:
           sudo mv syft /usr/local/bin/syft
           syft . -o json > sbom-syft-report.json
 
-      - name: Upload SBOM Report
-        uses: actions/upload-artifact@v3
+      - name: Upload Syft SBOM
+        uses: actions/upload-artifact@v2
         with:
           name: sbom-syft-report
           path: sbom-syft-report.json
 
-  # IaC Scan - Trivy
+  # IaC - Trivy Config
   iac_trivy:
-    name: IaC Scan - Trivy
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Install Trivy & Run IaC Scan
         run: |
@@ -125,7 +115,7 @@ jobs:
           trivy config . --format json --output trivy-iac-report.json || true
 
       - name: Upload Trivy IaC Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: trivy-iac-report
           path: trivy-iac-report.json
