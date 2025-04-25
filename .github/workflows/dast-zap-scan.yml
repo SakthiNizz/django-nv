@@ -16,30 +16,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Run ZAP Full Scan
-        uses: zaproxy/action-full-scan@v0.7.0
-        with:
-          target: 'https://demo.testfire.net/login.jsp'
-          reportType: 'json'
-          reportFile: 'zap_scan_report.json'  # Ensure the report is saved in the correct location
-
-      - name: Check if ZAP report exists
+      - name: Install ZAP and dependencies
         run: |
-          echo "Checking if report exists..."
-          ls -la  # This will list files in the current working directory
-          if [ ! -f zap_scan_report.json ]; then
-            echo "ZAP scan report not found!"
-            exit 1  # Exit with an error if the file isn't found
-          fi
-          echo "ZAP scan report found!"
+          sudo apt-get update
+          sudo apt-get install -y openjdk-11-jdk
+          curl -sS https://github.com/zaproxy/zaproxy/releases/download/v2.11.1/ZAP_2.11.1_Unix.tar.gz -o zap.tar.gz
+          tar -xvf zap.tar.gz
+          sudo mv zap-2.11.1 /opt/zap
+          sudo ln -s /opt/zap/zap.sh /usr/local/bin/zap
 
-      - name: Upload ZAP scan JSON report as artifact (using v3)
-        uses: actions/upload-artifact@v3
-        with:
-          name: zap_scan_report_json  # Artifact name for the JSON report
-          path: zap_scan_report.json  # Correct file path for the generated report
-
-      - name: Debug info (list uploaded files)
+      - name: Run ZAP Full Scan and print result in console
         run: |
-          echo "Listing files in the directory after upload step:"
-          ls -la  # Ensure the file is in the root before upload
+          zap -cmd -quickurl 'https://demo.testfire.net/login.jsp' -quickout /dev/stdout -json
