@@ -39,29 +39,29 @@ jobs:
 
   # SCA - Dependency Check
   sca_dependency_check:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v3
-
-    - name: Run Dependency Check
-      uses: dependency-check/Dependency-Check_Action@main
-      with:
-        project: django-nv
-        path: '.'
-        format: 'JSON'
-        out: 'reports'  # This ensures output is inside /reports/
-
-    - name: Check if dependency-check-report.json exists
-      run: |
-        echo "Checking for reports/dependency-check-report.json"
-        ls -la reports
-        cat reports/dependency-check-report.json || echo "dependency-check-report.json does not exist"
-
-    - name: Upload Dependency Check Report
-      uses: actions/upload-artifact@v4
-      with:
-        name: dependency-check-report
-        path: reports/dependency-check-report.json
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+  
+      - name: Run Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: django-nv
+          path: '.'
+          format: 'JSON'
+          out: 'reports'  # This ensures output is inside /reports/
+  
+      - name: Check if dependency-check-report.json exists
+        run: |
+          echo "Checking for reports/dependency-check-report.json"
+          ls -la reports
+          cat reports/dependency-check-report.json || echo "dependency-check-report.json does not exist"
+  
+      - name: Upload Dependency Check Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: reports/dependency-check-report.json
 
 
   # # Secrets - Gitleaks
