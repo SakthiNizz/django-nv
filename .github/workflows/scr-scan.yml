@@ -65,20 +65,20 @@ jobs:
   # Secrets - Gitleaks
   secrets_gitleaks:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
-      - name: Run Gitleaks
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Important for full Git history scan
+
+      - name: Run Gitleaks via Docker
         run: |
-          echo "Current directory before Gitleaks scan:"
-          pwd
-          echo "Contents of the directory before Gitleaks scan:"
-          ls -la
-          curl -sSL https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks-linux-amd64 -o gitleaks
-          sudo chmod +x gitleaks
-          ./gitleaks detect --source . --report-format json --report-path gitleaks-report.json || true
+          echo "Running Gitleaks Docker container..."
+          docker run --rm -v $(pwd):/path zricethezav/gitleaks:latest detect \
+            --source=/path \
+            --report-format=json \
+            --report-path=/path/gitleaks-report.json || true
 
       - name: Check if gitleaks-report.json exists
         run: |
