@@ -1,5 +1,9 @@
 name: DAST-ZAP Full Scan
 
+permissions:
+  issues: write
+  contents: read
+  
 on:
   schedule:
     # Run at 00:00 UTC every 15th day of the month
