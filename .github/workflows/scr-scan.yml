@@ -10,32 +10,32 @@ on:
   workflow_dispatch:
 
 jobs:
-  # # SAST - Bandit
-  # sast_bandit:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
+  # SAST - Bandit
+  sast_bandit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
 
-  #     - name: Install Bandit & Run Scan
-  #       run: |
-  #         echo "Current directory before scan:"
-  #         pwd
-  #         echo "Contents of the directory before scan:"
-  #         ls -la
-  #         pip install bandit
-  #         bandit -r . -f json -o bandit-report.json || true
+      - name: Install Bandit & Run Scan
+        run: |
+          echo "Current directory before scan:"
+          pwd
+          echo "Contents of the directory before scan:"
+          ls -la
+          pip install bandit
+          bandit -r . -f json -o bandit-report.json || true
 
-  #     - name: Check if bandit-report.json exists
-  #       run: |
-  #         echo "Checking for bandit-report.json"
-  #         ls -la
-  #         cat bandit-report.json || echo "bandit-report.json does not exist"
+      - name: Check if bandit-report.json exists
+        run: |
+          echo "Checking for bandit-report.json"
+          ls -la
+          cat bandit-report.json || echo "bandit-report.json does not exist"
 
-  #     - name: Upload Bandit Report
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: bandit-report
-  #         path: bandit-report.json
+      - name: Upload Bandit Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-report
+          path: bandit-report.json
 
   # SCA - Dependency Check
   sca_dependency_check:
@@ -64,116 +64,116 @@ jobs:
           path: reports/dependency-check-report.json
 
 
-  # # Secrets - Gitleaks
-  # secrets_gitleaks:
-  #   runs-on: ubuntu-latest
+  # Secrets - Gitleaks
+  secrets_gitleaks:
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v3
-  #       with:
-  #         fetch-depth: 0  # Important for full Git history scan
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Important for full Git history scan
 
-  #     - name: Run Gitleaks via Docker
-  #       run: |
-  #         echo "Running Gitleaks Docker container..."
-  #         docker run --rm -v $(pwd):/path zricethezav/gitleaks:latest detect \
-  #           --source=/path \
-  #           --report-format=json \
-  #           --report-path=/path/gitleaks-report.json || true
+      - name: Run Gitleaks via Docker
+        run: |
+          echo "Running Gitleaks Docker container..."
+          docker run --rm -v $(pwd):/path zricethezav/gitleaks:latest detect \
+            --source=/path \
+            --report-format=json \
+            --report-path=/path/gitleaks-report.json || true
 
-  #     - name: Check if gitleaks-report.json exists
-  #       run: |
-  #         echo "Checking for gitleaks-report.json"
-  #         ls -la
-  #         cat gitleaks-report.json || echo "gitleaks-report.json does not exist"
+      - name: Check if gitleaks-report.json exists
+        run: |
+          echo "Checking for gitleaks-report.json"
+          ls -la
+          cat gitleaks-report.json || echo "gitleaks-report.json does not exist"
 
-  #     - name: Upload Gitleaks Report
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: gitleaks-report
-  #         path: gitleaks-report.json
+      - name: Upload Gitleaks Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitleaks-report
+          path: gitleaks-report.json
 
-  # # Container - Trivy Filesystem
-  # container_trivy:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
+  # Container - Trivy Filesystem
+  container_trivy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
 
-  #     - name: Install Trivy & Run Scan
-  #       run: |
-  #         echo "Current directory before Trivy scan:"
-  #         pwd
-  #         echo "Contents of the directory before Trivy scan:"
-  #         ls -la
-  #         curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
-  #         trivy fs . --format json --output trivy-fs-report.json || true
+      - name: Install Trivy & Run Scan
+        run: |
+          echo "Current directory before Trivy scan:"
+          pwd
+          echo "Contents of the directory before Trivy scan:"
+          ls -la
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+          trivy fs . --format json --output trivy-fs-report.json || true
 
-  #     - name: Check if trivy-fs-report.json exists
-  #       run: |
-  #         echo "Checking for trivy-fs-report.json"
-  #         ls -la
-  #         cat trivy-fs-report.json || echo "trivy-fs-report.json does not exist"
+      - name: Check if trivy-fs-report.json exists
+        run: |
+          echo "Checking for trivy-fs-report.json"
+          ls -la
+          cat trivy-fs-report.json || echo "trivy-fs-report.json does not exist"
 
-  #     - name: Upload Trivy FS Report
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: trivy-fs-report
-  #         path: trivy-fs-report.json
+      - name: Upload Trivy FS Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-fs-report
+          path: trivy-fs-report.json
 
-  # # SBOM - Syft
-  # sbom_syft:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
+  # SBOM - Syft
+  sbom_syft:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
 
-  #     - name: Install Syft & Generate SBOM
-  #       run: |
-  #         echo "Current directory before Syft scan:"
-  #         pwd
-  #         echo "Contents of the directory before Syft scan:"
-  #         ls -la
-  #         curl -sSLo syft.tar.gz https://github.com/anchore/syft/releases/download/v0.104.0/syft_0.104.0_linux_amd64.tar.gz
-  #         tar -xzf syft.tar.gz syft
-  #         chmod +x syft
-  #         sudo mv syft /usr/local/bin/syft
-  #         syft . -o json > sbom-syft-report.json
+      - name: Install Syft & Generate SBOM
+        run: |
+          echo "Current directory before Syft scan:"
+          pwd
+          echo "Contents of the directory before Syft scan:"
+          ls -la
+          curl -sSLo syft.tar.gz https://github.com/anchore/syft/releases/download/v0.104.0/syft_0.104.0_linux_amd64.tar.gz
+          tar -xzf syft.tar.gz syft
+          chmod +x syft
+          sudo mv syft /usr/local/bin/syft
+          syft . -o json > sbom-syft-report.json
 
-  #     - name: Check if sbom-syft-report.json exists
-  #       run: |
-  #         echo "Checking for sbom-syft-report.json"
-  #         ls -la
-  #         cat sbom-syft-report.json || echo "sbom-syft-report.json does not exist"
+      - name: Check if sbom-syft-report.json exists
+        run: |
+          echo "Checking for sbom-syft-report.json"
+          ls -la
+          cat sbom-syft-report.json || echo "sbom-syft-report.json does not exist"
 
-  #     - name: Upload Syft SBOM
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: sbom-syft-report
-  #         path: sbom-syft-report.json
+      - name: Upload Syft SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-syft-report
+          path: sbom-syft-report.json
 
-  # # IaC - Trivy Config
-  # iac_trivy:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
+  # IaC - Trivy Config
+  iac_trivy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
 
-  #     - name: Install Trivy & Run IaC Scan
-  #       run: |
-  #         echo "Current directory before IaC Trivy scan:"
-  #         pwd
-  #         echo "Contents of the directory before IaC Trivy scan:"
-  #         ls -la
-  #         curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
-  #         trivy config . --format json --output trivy-iac-report.json || true
+      - name: Install Trivy & Run IaC Scan
+        run: |
+          echo "Current directory before IaC Trivy scan:"
+          pwd
+          echo "Contents of the directory before IaC Trivy scan:"
+          ls -la
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+          trivy config . --format json --output trivy-iac-report.json || true
 
-  #     - name: Check if trivy-iac-report.json exists
-  #       run: |
-  #         echo "Checking for trivy-iac-report.json"
-  #         ls -la
-  #         cat trivy-iac-report.json || echo "trivy-iac-report.json does not exist"
+      - name: Check if trivy-iac-report.json exists
+        run: |
+          echo "Checking for trivy-iac-report.json"
+          ls -la
+          cat trivy-iac-report.json || echo "trivy-iac-report.json does not exist"
 
-  #     - name: Upload Trivy IaC Report
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: trivy-iac-report
-  #         path: trivy-iac-report.json
+      - name: Upload Trivy IaC Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-iac-report
+          path: trivy-iac-report.json
