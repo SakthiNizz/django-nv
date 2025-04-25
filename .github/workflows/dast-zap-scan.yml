@@ -20,28 +20,26 @@ jobs:
         uses: zaproxy/action-full-scan@v0.7.0
         with:
           target: 'https://demo.testfire.net/login.jsp'
-          # Ensure output format is JSON
           reportType: 'json'
-          # Specify the location of the JSON report output
-          reportFile: '/zap/wrk/zap_scan_report.json'
+          reportFile: 'zap_scan_report.json'  # Store the report in the root of the workspace
 
       - name: Check if ZAP report exists
         run: |
           echo "Checking if report exists..."
-          ls -la /zap/wrk/
-          if [ ! -f /zap/wrk/zap_scan_report.json ]; then
+          ls -la  # Check for the file in the root directory
+          if [ ! -f zap_scan_report.json ]; then
             echo "ZAP scan report not found!"
             exit 1
           fi
           echo "ZAP scan report found!"
 
-      - name: Upload ZAP scan JSON report as artifact
-        uses: actions/upload-artifact@v2  # Updated to v2
+      - name: Upload ZAP scan JSON report as artifact (using v3)
+        uses: actions/upload-artifact@v3  # Switch to v3
         with:
           name: zap_scan_report_json  # Artifact name for the JSON report
-          path: /zap/wrk/zap_scan_report.json  # Correct file path for the generated report
-          
+          path: zap_scan_report.json  # Correct file path for the generated report
+
       - name: Debug info (list uploaded files)
         run: |
           echo "Listing files in the directory:"
-          ls -la /zap/wrk/
+          ls -la  # Ensure the file is in the root before upload
