@@ -37,60 +37,62 @@ jobs:
   #         name: bandit-report
   #         path: bandit-report.json
 
-  # # SCA - Dependency Check
-  # sca_dependency_check:
+  # SCA - Dependency Check
+  sca_dependency_check:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v3
+
+    - name: Run Dependency Check
+      uses: dependency-check/Dependency-Check_Action@main
+      with:
+        project: django-nv
+        path: '.'
+        format: 'JSON'
+        out: 'reports'  # This ensures output is inside /reports/
+
+    - name: Check if dependency-check-report.json exists
+      run: |
+        echo "Checking for reports/dependency-check-report.json"
+        ls -la reports
+        cat reports/dependency-check-report.json || echo "dependency-check-report.json does not exist"
+
+    - name: Upload Dependency Check Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: dependency-check-report
+        path: reports/dependency-check-report.json
+
+
+  # # Secrets - Gitleaks
+  # secrets_gitleaks:
   #   runs-on: ubuntu-latest
+
   #   steps:
-  #     - uses: actions/checkout@v3
-
-  #     - name: Run Dependency Check
-  #       uses: dependency-check/Dependency-Check_Action@main
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
   #       with:
-  #         project: django-nv
-  #         path: '.'
-  #         format: 'JSON'
+  #         fetch-depth: 0  # Important for full Git history scan
 
-  #     - name: Check if dependency-check-report.json exists
+  #     - name: Run Gitleaks via Docker
   #       run: |
-  #         echo "Checking for dependency-check-report.json"
-  #         ls -la
-  #         cat dependency-check-report.json || echo "dependency-check-report.json does not exist"
+  #         echo "Running Gitleaks Docker container..."
+  #         docker run --rm -v $(pwd):/path zricethezav/gitleaks:latest detect \
+  #           --source=/path \
+  #           --report-format=json \
+  #           --report-path=/path/gitleaks-report.json || true
 
-  #     - name: Upload Dependency Check Report
+  #     - name: Check if gitleaks-report.json exists
+  #       run: |
+  #         echo "Checking for gitleaks-report.json"
+  #         ls -la
+  #         cat gitleaks-report.json || echo "gitleaks-report.json does not exist"
+
+  #     - name: Upload Gitleaks Report
   #       uses: actions/upload-artifact@v4
   #       with:
-  #         name: dependency-check-report
-  #         path: dependency-check-report.json
-
-  # Secrets - Gitleaks
-  secrets_gitleaks:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Important for full Git history scan
-
-      - name: Run Gitleaks via Docker
-        run: |
-          echo "Running Gitleaks Docker container..."
-          docker run --rm -v $(pwd):/path zricethezav/gitleaks:latest detect \
-            --source=/path \
-            --report-format=json \
-            --report-path=/path/gitleaks-report.json || true
-
-      - name: Check if gitleaks-report.json exists
-        run: |
-          echo "Checking for gitleaks-report.json"
-          ls -la
-          cat gitleaks-report.json || echo "gitleaks-report.json does not exist"
-
-      - name: Upload Gitleaks Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: gitleaks-report
-          path: gitleaks-report.json
+  #         name: gitleaks-report
+  #         path: gitleaks-report.json
 
   # # Container - Trivy Filesystem
   # container_trivy:
