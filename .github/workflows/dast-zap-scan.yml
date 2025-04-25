@@ -34,7 +34,7 @@ jobs:
           echo "ZAP scan report found!"
 
       - name: Upload ZAP scan JSON report as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2  # Updated to v2
         with:
           name: zap_scan_report_json  # Artifact name for the JSON report
           path: /zap/wrk/zap_scan_report.json  # Correct file path for the generated report
